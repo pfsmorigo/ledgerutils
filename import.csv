@@ -1,0 +1,10 @@
+Match;Meaning;Account
+CXE;Saque em Caixa Eletrônico;Assets:Wallet
+LIS/JUROS;LIS/Juros;Expenses:Taxes
+REMUNERACAO/SALARIO;Remuneração/Salário;Income:Salary
+REND PAGO APLIC AUT MAIS;Rendimento Conta Corrente;Income:Revenue
+REND PAGO APLIC AUT APR;Rendimento pago pela aplicação automática;Income:Revenue
+TBI;Transferência;
+IOF;;Expenses:Taxes
+INT PAG TIT BANCO;Pagamento Titulo Bancário;
+INT PAG TIT;Pagamento de Título;
