@@ -150,6 +150,28 @@ def nubank(f):
         print new_entry
 
 
+def qif(f):
+    for line in f:
+        if line[0] is 'N':
+            account1 = line[1:].strip()
+
+        if line[0] is 'D':
+            date = time.strptime(line[1:].strip(), '%Y/%m/%d')
+
+        if line[0] is 'M':
+            desc = line[1:].strip()
+
+        if line[0] is 'S':
+            account2 = line[1:].strip()
+
+        if line[0] is '$':
+            value = float(line[1:])
+            new_entry = Transaction(date, desc)
+            new_entry.add(Account(account1, value))
+            new_entry.add(Account(account2))
+            print new_entry
+
+
 def conectcar(f):
     for line in f:
         line_split = line.split(";")
