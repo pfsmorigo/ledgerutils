@@ -9,6 +9,7 @@ import glob
 import os.path
 
 translation_list = {}
+ledger_file = None
 
 class Transaction:
     def __init__(self, date, desc, eff_date = None):
@@ -37,7 +38,7 @@ class Transaction:
         self.total += 1
 
     def __str__(self):
-        output = "\n%s" % time.strftime("%Y-%m-%d", self.date)
+        output = "%s" % time.strftime("%Y-%m-%d", self.date)
         if self.eff_date and self.date != self.eff_date:
             output += "=%s" % time.strftime("%Y-%m-%d", self.eff_date)
         output +=" %s" % self.desc
@@ -115,7 +116,7 @@ def itau(f):
         new_entry = Transaction(date, desc, eff_date)
         new_entry.add(Account("Assets:Checking", value))
         new_entry.add(Account(account))
-        print new_entry
+        write_entry(new_entry)
 
 
 def nubank(f):
@@ -147,7 +148,7 @@ def nubank(f):
                 eff_date = pay_date(eff_date, eff_date.tm_mday, 0)
 
         new_entry.add(Account("Liabilities:Nubank"))
-        print new_entry
+        write_entry(new_entry)
 
 
 def qif(f):
@@ -169,7 +170,7 @@ def qif(f):
             new_entry = Transaction(date, desc)
             new_entry.add(Account(account1, value))
             new_entry.add(Account(account2))
-            print new_entry
+            write_entry(new_entry)
 
 
 def conectcar(f):
@@ -185,13 +186,41 @@ def conectcar(f):
         value = "%.2f BRL" % (float(outcome.strip())*(-1))
         print_entry(date, description, value, "Expeses:House", outcome)
 
+
+def insert_ledger_file(ledger_file, new_entry):
+    input_file = open(ledger_file, 'r').readlines()
+    write_file = open(ledger_file,'w')
+    pattern = re.compile('(\d+-\d+-\d+)')
+    done = False
+
+    for line in input_file:
+        if not done and pattern.match(line):
+            date_txt = line.split(' ', 1)[0].split('=', 1)[0]
+            if time.strptime(date_txt, '%Y-%m-%d') > new_entry.date:
+                write_file.write("%s\n\n" % new_entry)
+                done = True
+        write_file.write(line)
+
+    if not done:
+        write_file.write("\n%s\n" % new_entry)
+
+    write_file.close()
+
+def write_entry(new_entry):
+    if ledger_file:
+        insert_ledger_file(ledger_file, new_entry)
+    else:
+        print "\n%s" % new_entry
+
 if len(sys.argv) < 3:
-    print "Need arguments! %s <account> <filename>" % sys.argv[0]
+    print "Need arguments! %s <account> <input_file> <ledger_file>" % sys.argv[0]
 else:
     load_list_csv()
     account = sys.argv[1]
 
-    for i in range(len(sys.argv)-2):
-        with open(sys.argv[i+2], 'r') as f:
-            eval(account + "(f)")
-            f.close()
+    if len(sys.argv) > 3:
+        ledger_file = sys.argv[3] if os.path.isfile(sys.argv[3]) else None
+
+    with open(sys.argv[2], 'r') as f:
+        eval(account + "(f)")
+        f.close()
