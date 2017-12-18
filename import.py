@@ -132,7 +132,7 @@ def nubank(f):
         desc, account = translate(desc, "Expenses:Unknown")
         total = 0
 
-        if re.search(r'.* [0-9]\/[0-9].*$', desc) is not None:
+        if re.search(r'.* [0-9]+\/[0-9]+.*$', desc) is not None:
             part, total = map(int, desc.split()[-1].split('/'))
             desc = desc.rsplit(' ', 1)[0]
 
