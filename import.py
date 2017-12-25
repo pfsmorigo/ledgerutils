@@ -165,7 +165,7 @@ def qif(f):
         if line[0] is 'S':
             account2 = line[1:].strip()
 
-        if line[0] is '$':
+        if line[0] is '$' and desc != "Opening Balances":
             value = float(line[1:])
             new_entry = Transaction(date, desc)
             new_entry.add(Account(account1, value))
