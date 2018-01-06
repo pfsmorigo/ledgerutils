@@ -6,19 +6,16 @@ import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-def commodity2float(commodity):
-    return float(commodity.replace(",", "").split(" ")[0])
-
 def get_amount(account):
     output = {}
-    ACCOUNT_LIST = subprocess.check_output(['ledger', '-rVS', 'date', '--effective', '--register-format', '%(effective_date);%(amount)\n', 'register', account]).split("\n")
+    ACCOUNT_LIST = subprocess.check_output(['ledger', '-rVS', 'date', '--effective', '--register-format', '%(effective_date);%(quantity(scrub(display_amount)))\n', 'register', account]).split("\n")
     for LINE in ACCOUNT_LIST:
         if len(LINE) > 0:
             DATE, VALUE = LINE.split(";")
             if DATE:
                 INDEX = int(''.join(DATE.split("/")[:-1]))
                 ADD = output[INDEX] if INDEX in output.keys() else 0.0
-                output[INDEX] = commodity2float(VALUE)+ADD
+                output[INDEX] = float(VALUE)+ADD
     return output
 
 accounts = {}
