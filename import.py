@@ -1,6 +1,3 @@
-"""
-Module import
-"""
 #!/usr/bin/env python
 
 import sys
