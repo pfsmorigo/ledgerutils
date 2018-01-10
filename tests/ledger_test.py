@@ -15,8 +15,8 @@ class TestLedger(unittest.TestCase):
         """
         Setup test
         """
-        self._itau = Itau(None)
-        self._nubank = Nubank(None)
+        self._itau = Itau(None, None)
+        self._nubank = Nubank(None, None)
 
     def test_new_entry_itau(self):
         """
@@ -57,3 +57,19 @@ class TestLedger(unittest.TestCase):
     Liabilities:Nubank"""
 
         self.assertEqual(str(self._nubank.list_entry()[7]), result)
+
+    def test_use_conf(self):
+        """
+        Test_use_conf
+        """
+        _nubank = Nubank(None, {'pay_day': 10, 'best_day': 3})
+
+        with open("./tests/fixture/nubank.csv", 'r') as csv_file:
+            _nubank.read_file(csv_file)
+            csv_file.close()
+
+        result = """2017-09-15=2017-10-10 Pagamento recebido
+    Expenses:Unknown                     -998.99 BRL
+    Liabilities:Nubank"""
+
+        self.assertEqual(str(_nubank.list_entry()[7]), result)
