@@ -26,24 +26,17 @@ class TestLedger(unittest.TestCase):
             self._itau.read_file(csv_file)
             csv_file.close()
 
-        self.assertEqual(self._itau.list_entry()[0].desc, 'RSHOP-CENTER CAST')
-        self.assertEqual(self._itau.list_entry()[1].desc, 'RSHOP-H2O DISTRIB')
-        self.assertEqual(self._itau.list_entry()[2].desc,
-                         '(#422) INT PAG TIT BANCO')
-        self.assertEqual(self._itau.list_entry()[3].desc,
-                         '(#0100317) INT TIM CELULAR')
-        self.assertEqual(
-            self._itau.list_entry()[4].desc,
-            'REMUNERACAO/SALARIO')
-        self.assertEqual(self._itau.list_entry()[5].desc, '(#06920987) TBI')
-        self.assertEqual(self._itau.list_entry()[6].desc,
-                         'REND PAGO APLIC AUT MAIS')
-        self.assertEqual(self._itau.list_entry()[7].desc,
-                         'RSHOP-ELETRO ELET')
-        self.assertEqual(
-            self._itau.list_entry()[8].desc,
-            'REMUNERACAO/SALARIO')
-        self.assertEqual(self._itau.list_entry()[9].desc, 'CXE')
+        result = """2017-09-15 (#422) INT PAG TIT BANCO
+    Assets:Checking                      -998.99 BRL
+    Expenses:Unknown"""
+
+        assert str(self._itau.list_entry()[2]) == result
+
+        result = """2017-09-30 CXE
+    Assets:Checking                      -100.00 BRL
+    Expenses:Unknown"""
+
+        assert str(self._itau.list_entry()[9]) == result
 
     def test_new_entry_nubank(self):
         """
@@ -53,11 +46,14 @@ class TestLedger(unittest.TestCase):
             self._nubank.read_file(csv_file)
             csv_file.close()
 
-        self.assertEqual(
-            self._nubank.list_entry()[0].desc, 'Auto Posto Piratininga')
-        self.assertEqual(self._nubank.list_entry()[1].desc, 'Lojas Americanas')
-        self.assertEqual(self._nubank.list_entry()[2].desc, 'Netflix.Com')
-        self.assertEqual(self._nubank.list_entry()[6].desc, 'Poli Pet')
-        self.assertEqual(
-            self._nubank.list_entry()[7].desc,
-            'Pagamento recebido')
+        result = """2017-09-11=2017-10-15 Netflix.Com
+    Expenses:Unknown                       27.90 BRL
+    Liabilities:Nubank"""
+
+        self.assertEqual(str(self._nubank.list_entry()[2]), result)
+
+        result = """2017-09-15=2017-10-15 Pagamento recebido
+    Expenses:Unknown                     -998.99 BRL
+    Liabilities:Nubank"""
+
+        self.assertEqual(str(self._nubank.list_entry()[7]), result)
