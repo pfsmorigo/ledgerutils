@@ -10,10 +10,8 @@ from ledger import load_list_csv
 from ledger import Itau
 from ledger import Nubank
 
-
 if len(sys.argv) < 3:
-    print("Need arguments! {} <account> <input_file> \
-            <ledger_file>".format(sys.argv[0]))
+    print("Need arguments! {} <account> <input_file> <ledger_file>".format(sys.argv[0]))
 else:
     load_list_csv()
     ACCOUNT = sys.argv[1]
