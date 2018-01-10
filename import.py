@@ -6,6 +6,7 @@ import os
 from ledger import load_list_csv
 from ledger import Itau
 from ledger import Nubank
+from ledger import QIF
 
 if len(sys.argv) < 3:
     print("Need arguments! {} <account> <input_file> <ledger_file>".format(sys.argv[0]))
@@ -19,7 +20,8 @@ else:
 
     LIST_BANKS = {
         'itau': Itau(LEDGER_FILE),
-        'nubank': Nubank(LEDGER_FILE)
+        'nubank': Nubank(LEDGER_FILE),
+        'qif': QIF(LEDGER_FILE)
         }
 
     BANK = LIST_BANKS[ACCOUNT]
