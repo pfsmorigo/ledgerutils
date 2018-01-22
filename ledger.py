@@ -97,6 +97,9 @@ def load_list_csv():
 
 
 def translate(desc, account="Unknown"):
+    """
+    Translate
+    """
     for item in TRANSLATION_LIST:
         if item not in desc:
             continue
@@ -107,29 +110,23 @@ def translate(desc, account="Unknown"):
     return desc, account
 
 
-def pay_date(date, pay_day, best_day):
-    month = date.tm_mon
-    year = date.tm_year
-    if date.tm_mday >= best_day:
-        if date.tm_mon == 12:
-            month = 1
-            year += 1
-        else:
-            month += 1
-    date = "%d-%02d-%02d" % (year, month, pay_day)
-    return time.strptime(date, "%Y-%m-%d")
-
-
 class Ledger(object):
     """Docstring for Ledger. """
 
-    def __init__(self, legder_file):
+    _pay_day = 15
+    _best_day = 8
+
+    def __init__(self, legder_file, conf):
         """TODO: Docstring for __init__.
         :returns: TODO
 
         """
         self._list_entry = []
         self._ledger_file = legder_file
+
+        if conf:
+            self._pay_day = int(conf['pay_day'])
+            self._best_day = int(conf['best_day'])
 
     def write_entry(self):
         """TODO: Docstring for write_entry.
@@ -151,13 +148,28 @@ class Ledger(object):
         """
         return self._list_entry
 
+    def pay_date(self, date, pay_day, best_day):
+        """
+        Pay date
+        """
+        month = date.tm_mon
+        year = date.tm_year
+        if date.tm_mday >= best_day:
+            if date.tm_mon == 12:
+                month = 1
+                year += 1
+            else:
+                month += 1
+        date = "%d-%02d-%02d" % (year, month, pay_day)
+        return time.strptime(date, "%Y-%m-%d")
+
 
 class Itau(Ledger):
     """Docstring for Itau. """
 
-    def __init__(self, ledger_file):
+    def __init__(self, ledger_file, conf):
         """Init Itau"""
-        Ledger.__init__(self, ledger_file)
+        Ledger.__init__(self, ledger_file, conf)
 
     def read_file(self, _file):
         """Read file
@@ -188,9 +200,9 @@ class Itau(Ledger):
 class Nubank(Ledger):
     """Docstring for Nubank. """
 
-    def __init__(self, ledger_file):
+    def __init__(self, ledger_file, conf):
         """Init Nubank"""
-        Ledger.__init__(self, ledger_file)
+        Ledger.__init__(self, ledger_file, conf)
 
     def read_file(self, _file):
         """
@@ -205,7 +217,7 @@ class Nubank(Ledger):
             date = time.strptime(line_split[0], '%Y-%m-%d')
             desc = line_split[2]
             value = float(line_split[3])
-            eff_date = pay_date(date, 15, 8)
+            eff_date = self.pay_date(date, self._pay_day, self._best_day)
             desc, account = translate(desc, "Expenses:Unknown")
             total = 0
 
@@ -222,7 +234,7 @@ class Nubank(Ledger):
                 new_entry = Transaction(date, desc)
                 for _ in range(total):
                     new_entry.add(Account(account, value, eff_date=eff_date))
-                    eff_date = pay_date(eff_date, eff_date.tm_mday, 0)
+                    eff_date = self.pay_date(eff_date, eff_date.tm_mday, 0)
 
             new_entry.add(Account("Liabilities:Nubank"))
             self._list_entry.append(new_entry)
@@ -232,11 +244,15 @@ class QIF(Ledger):
     """
     Docstring for QIF.
     """
-    def __init__(self, ledger_file):
+
+    def __init__(self, ledger_file, conf):
         """Init QIF"""
-        Ledger.__init__(self, ledger_file)
+        Ledger.__init__(self, ledger_file, conf)
 
     def read_file(self, _file):
+        """
+        Read file
+        """
         for line in _file:
             if line[0] == 'N':
                 account1 = line[1:].strip()
@@ -257,7 +273,11 @@ class QIF(Ledger):
                 new_entry.add(Account(account2))
                 self._list_entry.append(new_entry)
 
+
 def insert_ledger_file(ledger_file, new_entry):
+    """
+    Insert ledger file
+    """
     input_file = open(ledger_file, 'r').readlines()
     write_file = open(ledger_file, 'w')
     pattern = re.compile('(\d+-\d+-\d+)')
