@@ -192,8 +192,12 @@ class Itau(Ledger):
                 desc = desc[:-6]
 
             new_entry = Transaction(date, desc, eff_date)
-            new_entry.add(Account("Assets:Checking", value))
-            new_entry.add(Account(account))
+            if value > 0:
+                new_entry.add(Account("Assets:Checking", value))
+                new_entry.add(Account(account))
+            else:
+                new_entry.add(Account(account, value*(-1)))
+                new_entry.add(Account("Assets:Checking"))
             self._list_entry.append(new_entry)
 
 
@@ -272,7 +276,6 @@ class QIF(Ledger):
                 new_entry.add(Account(account1, value))
                 new_entry.add(Account(account2))
                 self._list_entry.append(new_entry)
-
 
 def insert_ledger_file(ledger_file, new_entry):
     """
