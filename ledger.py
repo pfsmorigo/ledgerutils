@@ -113,9 +113,6 @@ def translate(desc, account="Unknown"):
 class Ledger(object):
     """Docstring for Ledger. """
 
-    _pay_day = 15
-    _best_day = 8
-
     def __init__(self, legder_file, conf):
         """TODO: Docstring for __init__.
         :returns: TODO
@@ -123,10 +120,6 @@ class Ledger(object):
         """
         self._list_entry = []
         self._ledger_file = legder_file
-
-        if conf:
-            self._pay_day = int(conf['pay_day'])
-            self._best_day = int(conf['best_day'])
 
     def write_entry(self):
         """TODO: Docstring for write_entry.
@@ -167,9 +160,14 @@ class Ledger(object):
 class Itau(Ledger):
     """Docstring for Itau. """
 
+    _account_name = "Assets:Checking"
+
     def __init__(self, ledger_file, conf):
         """Init Itau"""
         Ledger.__init__(self, ledger_file, conf)
+
+        if 'account_name' in conf:
+            self._account_name = conf['account_name']
 
     def read_file(self, _file):
         """Read file
@@ -193,20 +191,31 @@ class Itau(Ledger):
 
             new_entry = Transaction(date, desc, eff_date)
             if value > 0:
-                new_entry.add(Account("Assets:Checking", value))
+                new_entry.add(Account(self._account_name, value))
                 new_entry.add(Account(account))
             else:
                 new_entry.add(Account(account, value*(-1)))
-                new_entry.add(Account("Assets:Checking"))
+                new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)
 
 
 class Nubank(Ledger):
     """Docstring for Nubank. """
 
+    _account_name = "Liabilities:Nubank"
+    _pay_day = 15
+    _best_day = 8
+
     def __init__(self, ledger_file, conf):
         """Init Nubank"""
         Ledger.__init__(self, ledger_file, conf)
+
+        if 'account_name' in conf:
+            self._account_name = conf['account_name']
+        if 'pay_day' in conf:
+            self._pay_day = int(conf['pay_day'])
+        if 'best_day' in conf:
+            self._best_day = int(conf['best_day'])
 
     def read_file(self, _file):
         """
@@ -240,7 +249,7 @@ class Nubank(Ledger):
                     new_entry.add(Account(account, value, eff_date=eff_date))
                     eff_date = self.pay_date(eff_date, eff_date.tm_mday, 0)
 
-            new_entry.add(Account("Liabilities:Nubank"))
+            new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)
 
 

@@ -1,3 +1,7 @@
+[itau]
+account_name = Assets:Checking
+
 [nubank]
+account_name = Liabilities:Nubank
 pay_day=10
 best_day=8
