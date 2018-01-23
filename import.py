@@ -7,6 +7,7 @@ import sys
 import os
 import configparser
 import argparse
+import dateutil.parser
 
 from ledger import load_list_csv
 from ledger import Itau
@@ -27,20 +28,24 @@ parser.add_argument("input_file", type=argparse.FileType('r'),
 args = parser.parse_args()
 
 CONFIG = configparser.ConfigParser()
-CONF_ACCOUNT = None
+conf_account = None
+from_date = None
 
 load_list_csv()
+
+if args.date:
+    from_date = dateutil.parser.parse(args.date).timetuple()
 
 if os.path.isfile('ledgerutils.conf'):
     CONFIG.read('ledgerutils.conf')
 
 if args.account in CONFIG.sections():
-    CONF_ACCOUNT = CONFIG[args.account]
+    conf_account = CONFIG[args.account]
 
 LIST_BANKS = {
-    'itau': Itau(args.output, CONF_ACCOUNT),
-    'nubank': Nubank(args.output, CONF_ACCOUNT),
-    'qif': QIF(args.output, CONF_ACCOUNT)
+    'itau': Itau(args.output, conf_account, from_date=from_date),
+    'nubank': Nubank(args.output, conf_account, from_date=from_date),
+    'qif': QIF(args.output, conf_account, from_date=from_date)
 }
 
 BANK = LIST_BANKS[args.account]

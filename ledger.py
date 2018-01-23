@@ -161,13 +161,16 @@ class Itau(Ledger):
     """Docstring for Itau. """
 
     _account_name = "Assets:Checking"
+    _from_date = None
 
-    def __init__(self, ledger_file, conf):
+    def __init__(self, ledger_file, conf, from_date=None):
         """Init Itau"""
         Ledger.__init__(self, ledger_file, conf)
 
         if 'account_name' in conf:
             self._account_name = conf['account_name']
+
+        self._from_date = from_date
 
     def read_file(self, _file):
         """Read file
@@ -179,6 +182,10 @@ class Itau(Ledger):
         for line in _file:
             line_split = line.split(";")
             date = time.strptime(line_split[0], '%d/%m/%Y')
+
+            if date is not None and date < self._from_date:
+                continue
+
             desc = line_split[1].strip()
             value = float(line_split[2].strip().replace(",", "."))
             desc, account = translate(desc, "Expenses:Unknown")
@@ -205,8 +212,9 @@ class Nubank(Ledger):
     _account_name = "Liabilities:Nubank"
     _pay_day = 15
     _best_day = 8
+    _from_date = None
 
-    def __init__(self, ledger_file, conf):
+    def __init__(self, ledger_file, conf, from_date=None):
         """Init Nubank"""
         Ledger.__init__(self, ledger_file, conf)
 
@@ -216,6 +224,8 @@ class Nubank(Ledger):
             self._pay_day = int(conf['pay_day'])
         if 'best_day' in conf:
             self._best_day = int(conf['best_day'])
+
+        self._from_date = from_date
 
     def read_file(self, _file):
         """
@@ -228,6 +238,10 @@ class Nubank(Ledger):
 
             line_split = line.split(",")
             date = time.strptime(line_split[0], '%Y-%m-%d')
+
+            if date is not None and date < self._from_date:
+                continue
+
             desc = line_split[2]
             value = float(line_split[3])
             eff_date = self.pay_date(date, self._pay_day, self._best_day)
@@ -258,7 +272,7 @@ class QIF(Ledger):
     Docstring for QIF.
     """
 
-    def __init__(self, ledger_file, conf):
+    def __init__(self, ledger_file, conf, from_date=None):
         """Init QIF"""
         Ledger.__init__(self, ledger_file, conf)
 
