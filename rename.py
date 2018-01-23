@@ -14,7 +14,10 @@ else:
     old_txt_padded = None
     new_txt_padded = None
 
-    if len(new_txt) > len(old_txt):
+    if len(new_txt) == len(old_txt):
+        old_txt_padded = old_txt
+        new_txt_padded = new_txt
+    elif len(new_txt) > len(old_txt):
         old_txt_padded = old_txt.ljust(len(old_txt)+len(new_txt)-len(old_txt))
         new_txt_padded = new_txt
     elif len(old_txt) > len(new_txt):
