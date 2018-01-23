@@ -63,7 +63,7 @@ class Account(object):
     """
 
     def __init__(self, name=None, value=None, currency="BRL", eff_date=None):
-        self.name = name
+        self.name = str(name) if name else None
         self.value = value
         self.currency = currency
         self.eff_date = eff_date
