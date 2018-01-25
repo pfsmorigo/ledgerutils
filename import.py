@@ -9,6 +9,7 @@ import configparser
 import argparse
 import dateutil.parser
 
+from modules import Alelo
 from modules import Itau
 from modules import Nubank
 from modules import QIF
@@ -26,7 +27,7 @@ parser.add_argument("-o", type=argparse.FileType("w"), default=None,
         dest="output_file", metavar="OUTPUT",
         help="Output file to write new entries")
 parser.add_argument("account",
-        help="Format name. Currently supports: 'itau', 'nubank', 'qif'")
+        help="Format name. Currently supports: 'alelo', 'itau', 'nubank', 'qif'")
 args = parser.parse_args()
 
 CONFIG = configparser.ConfigParser()
@@ -52,6 +53,7 @@ elif 'input_file' in conf:
     input_file = open(conf['input_file'], "r")
 
 LIST_BANKS = {
+    'alelo': Alelo.Alelo(args.output_file, conf, from_date=from_date),
     'itau': Itau.Itau(args.output_file, conf, from_date=from_date),
     'nubank': Nubank.Nubank(args.output_file, conf, from_date=from_date),
     'qif': QIF.QIF(args.output_file, conf, from_date=from_date)
