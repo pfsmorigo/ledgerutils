@@ -1,3 +1,11 @@
+[alimentacao]
+account_type = alelo
+account_name = Assets:Alelo:Alimentacao
+
+[refeicao]
+account_type = alelo
+account_name = Assets:Alelo:Refeicao
+
 [itau]
 input_file = PATH
 account_name = Assets:Checking

@@ -34,6 +34,7 @@ CONFIG = configparser.ConfigParser()
 conf = None
 from_date = None
 input_file = None
+account_type = args.account
 
 load_list_csv()
 
@@ -45,6 +46,9 @@ if os.path.isfile('ledgerutils.conf'):
 
 if args.account in CONFIG.sections():
     conf = CONFIG[args.account]
+
+if conf and "account_type" in conf:
+    account_type = conf["account_type"]
 
 # Command line has priority over config file
 if args.input_file:
@@ -60,6 +64,6 @@ LIST_BANKS = {
 }
 
 if input_file:
-    BANK = LIST_BANKS[args.account]
+    BANK = LIST_BANKS[account_type]
     BANK.read_file(input_file)
     BANK.write_entry()
