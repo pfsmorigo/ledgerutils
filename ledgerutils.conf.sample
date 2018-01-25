@@ -1,9 +1,9 @@
 [itau]
-#input_file = PATH
+input_file = PATH
 account_name = Assets:Checking
 
 [nubank]
-#input_file = PATH
+input_file = PATH
 account_name = Liabilities:Nubank
 pay_day=10
 best_day=8
