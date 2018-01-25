@@ -20,7 +20,7 @@ class Alelo(Ledger):
         """Init Alelo"""
         Ledger.__init__(self, ledger_file, conf)
 
-        if 'account_name' in conf:
+        if conf and 'account_name' in conf:
             self._account_name = conf['account_name'].encode('utf-8')
 
         self._from_date = from_date

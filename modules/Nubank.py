@@ -21,12 +21,13 @@ class Nubank(Ledger):
         """Init Nubank"""
         Ledger.__init__(self, ledger_file, conf)
 
-        if 'account_name' in conf:
-            self._account_name = conf['account_name']
-        if 'pay_day' in conf:
-            self._pay_day = int(conf['pay_day'])
-        if 'best_day' in conf:
-            self._best_day = int(conf['best_day'])
+        if conf:
+            if 'account_name' in conf:
+                self._account_name = conf['account_name']
+            if 'pay_day' in conf:
+                self._pay_day = int(conf['pay_day'])
+            if 'best_day' in conf:
+                self._best_day = int(conf['best_day'])
 
         self._from_date = from_date
 

@@ -20,7 +20,7 @@ class Itau(Ledger):
         """Init Itau"""
         Ledger.__init__(self, ledger_file, conf)
 
-        if 'account_name' in conf:
+        if conf and 'account_name' in conf:
             self._account_name = conf['account_name']
 
         self._from_date = from_date
