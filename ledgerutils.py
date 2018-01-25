@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 import sys
 import os
@@ -13,7 +14,7 @@ from modules import QIF
 
 from ledger import load_list_csv
 
-def convert(module, args):
+def convert(module, account_type, args):
     input_file = None
 
     # Command line has priority over config file
@@ -26,9 +27,12 @@ def convert(module, args):
         module.read_file(input_file)
         module.write_entry()
 
-def online(module, args):
-    module.online()
-    module.write_entry()
+def online(module, account_type, args):
+    if account_type == "alelo" and len(args.info) == 1:
+        module.online(args.info[0])
+        module.write_entry()
+    else:
+        print "Something went wrong... Check your parameters"
 
 parser = argparse.ArgumentParser(
         description="Utilities to help with plaintext accounting.")
@@ -38,8 +42,7 @@ parser.add_argument("-d", type=str, metavar="DATE", dest="date",
 subparsers = parser.add_subparsers(help="Command to run")
 
 parser_convert = subparsers.add_parser("convert", help="Convert file into ledger format")
-parser_convert.add_argument("account", type=str, help="Format name",
-        choices=set(("alelo", "itau", "nubank", "qif")))
+parser_convert.add_argument("account", type=str, help="Format name")
 parser_convert.add_argument("-i", type=argparse.FileType("r"), default=None,
         dest="input_file", metavar="INPUT",
         help="Input file used by the parser")
@@ -49,8 +52,7 @@ parser_convert.add_argument("-o", type=argparse.FileType("r"), default=None,
 parser_convert.set_defaults(func=convert)
 
 parser_online = subparsers.add_parser("online", help="Get information online")
-parser_online.add_argument("account", type=str, help="Format name",
-        choices=set(("alelo", "itau", "nubank", "qif")))
+parser_online.add_argument("account", type=str, help="Format name")
 parser_online.add_argument("info", type=str, nargs='*', help="Infos to access")
 parser_online.add_argument("-o", type=argparse.FileType("r"), default=None,
         dest="output_file", metavar="OUTPUT",
@@ -91,4 +93,4 @@ MODULES = {
     'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
 }
 
-args.func(MODULES[account_type], args)
+args.func(MODULES[account_type], account_type, args)
