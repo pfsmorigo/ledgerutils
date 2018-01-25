@@ -23,7 +23,7 @@ parser.add_argument("-d", type=str, metavar="DATE", dest="date",
 parser.add_argument("-i", type=argparse.FileType("r"), default=None,
         dest="input_file", metavar="INPUT",
         help="Input file used by the parser")
-parser.add_argument("-o", type=argparse.FileType("w"), default=None,
+parser.add_argument("-o", type=argparse.FileType("r"), default=None,
         dest="output_file", metavar="OUTPUT",
         help="Output file to write new entries")
 parser.add_argument("account",
@@ -34,6 +34,7 @@ CONFIG = configparser.ConfigParser()
 conf = None
 from_date = None
 input_file = None
+output_file = None
 account_type = args.account
 
 load_list_csv()
@@ -55,12 +56,16 @@ if args.input_file:
     input_file = args.input_file
 elif 'input_file' in conf:
     input_file = open(conf['input_file'], "r")
+if args.output_file:
+    output_file = args.output_file
+elif 'output_file' in conf:
+    output_file = open(conf['output_file'], "r")
 
 LIST_BANKS = {
-    'alelo': Alelo.Alelo(args.output_file, conf, from_date=from_date),
-    'itau': Itau.Itau(args.output_file, conf, from_date=from_date),
-    'nubank': Nubank.Nubank(args.output_file, conf, from_date=from_date),
-    'qif': QIF.QIF(args.output_file, conf, from_date=from_date)
+    'alelo': Alelo.Alelo(conf, output_file=output_file, from_date=from_date),
+    'itau': Itau.Itau(conf, output_file=output_file, from_date=from_date),
+    'nubank': Nubank.Nubank(conf, output_file=output_file, from_date=from_date),
+    'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
 }
 
 if input_file:

@@ -16,9 +16,9 @@ class Alelo(Ledger):
     _account_name = "Assets:Alelo"
     _from_date = None
 
-    def __init__(self, ledger_file, conf, from_date=None):
+    def __init__(self, conf, output_file=None, from_date=None):
         """Init Alelo"""
-        Ledger.__init__(self, ledger_file, conf)
+        Ledger.__init__(self, conf, output_file)
 
         if conf and 'account_name' in conf:
             self._account_name = conf['account_name'].encode('utf-8')

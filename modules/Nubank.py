@@ -17,9 +17,9 @@ class Nubank(Ledger):
     _best_day = 8
     _from_date = None
 
-    def __init__(self, ledger_file, conf, from_date=None):
+    def __init__(self, conf, output_file=None, from_date=None):
         """Init Nubank"""
-        Ledger.__init__(self, ledger_file, conf)
+        Ledger.__init__(self, conf, output_file)
 
         if conf:
             if 'account_name' in conf:

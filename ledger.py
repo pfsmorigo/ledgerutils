@@ -113,13 +113,13 @@ def translate(desc, account="Unknown"):
 class Ledger(object):
     """Docstring for Ledger. """
 
-    def __init__(self, legder_file, conf):
+    def __init__(self, conf, output_file):
         """TODO: Docstring for __init__.
         :returns: TODO
 
         """
         self._list_entry = []
-        self._ledger_file = legder_file
+        self._output_file = output_file
 
     def write_entry(self):
         """TODO: Docstring for write_entry.
@@ -129,8 +129,8 @@ class Ledger(object):
 
         """
         for entry in self._list_entry:
-            if self._ledger_file:
-                insert_ledger_file(self._ledger_file, entry)
+            if self._output_file:
+                insert_ledger_file(self._output_file, entry)
             else:
                 print("\n%s" % entry)
 

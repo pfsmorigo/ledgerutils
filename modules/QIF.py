@@ -14,9 +14,9 @@ class QIF(Ledger):
     Docstring for QIF.
     """
 
-    def __init__(self, ledger_file, conf, from_date=None):
+    def __init__(self, conf, output_file=None, from_date=None):
         """Init QIF"""
-        Ledger.__init__(self, ledger_file, conf)
+        Ledger.__init__(self, conf, output_file)
 
     def read_file(self, _file):
         """
