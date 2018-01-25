@@ -8,6 +8,7 @@ import argparse
 import dateutil.parser
 
 from modules import Alelo
+from modules import Conectcar
 from modules import Itau
 from modules import Nubank
 from modules import QIF
@@ -30,6 +31,9 @@ def convert(module, account_type, args):
 def online(module, account_type, args):
     if account_type == "alelo" and len(args.info) == 1:
         module.online(args.info[0])
+        module.write_entry()
+    elif account_type == "conectcar" and len(args.info) == 2:
+        module.online(args.info[0], args.info[1])
         module.write_entry()
     else:
         print "Something went wrong... Check your parameters"
@@ -88,6 +92,7 @@ if conf and "account_type" in conf:
 
 MODULES = {
     'alelo': Alelo.Alelo(conf, output_file=output_file, from_date=from_date),
+    'conectcar': Conectcar.Conectcar(conf, output_file=output_file, from_date=from_date),
     'itau': Itau.Itau(conf, output_file=output_file, from_date=from_date),
     'nubank': Nubank.Nubank(conf, output_file=output_file, from_date=from_date),
     'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
