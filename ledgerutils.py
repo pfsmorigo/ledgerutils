@@ -13,33 +13,59 @@ from modules import QIF
 
 from ledger import load_list_csv
 
+def convert(module, args):
+    input_file = None
+
+    # Command line has priority over config file
+    if args.input_file:
+        input_file = args.input_file
+    elif 'input_file' in conf:
+        input_file = open(conf['input_file'], "r")
+
+    if input_file:
+        module.read_file(input_file)
+        module.write_entry()
+
+def online(module, args):
+    module.online()
+    module.write_entry()
+
 parser = argparse.ArgumentParser(
-        description="Import files into ledger format.")
+        description="Utilities to help with plaintext accounting.")
 parser.add_argument("-d", type=str, metavar="DATE", dest="date",
         help="Start parsing from this date")
-parser.add_argument("-i", type=argparse.FileType("r"), default=None,
+
+subparsers = parser.add_subparsers(help="Command to run")
+
+parser_convert = subparsers.add_parser("convert", help="Convert file into ledger format")
+parser_convert.add_argument("account", type=str, help="Format name",
+        choices=set(("alelo", "itau", "nubank", "qif")))
+parser_convert.add_argument("-i", type=argparse.FileType("r"), default=None,
         dest="input_file", metavar="INPUT",
         help="Input file used by the parser")
-parser.add_argument("-o", type=argparse.FileType("r"), default=None,
+parser_convert.add_argument("-o", type=argparse.FileType("r"), default=None,
         dest="output_file", metavar="OUTPUT",
         help="Output file to write new entries")
-parser.add_argument("command",
-        help="Command. Currently supports: 'import', and 'online'")
-parser.add_argument("account",
-        help="Format name. Currently supports: 'alelo', 'itau', 'nubank', and 'qif'")
+parser_convert.set_defaults(func=convert)
+
+parser_online = subparsers.add_parser("online", help="Get information online")
+parser_online.add_argument("account", type=str, help="Format name",
+        choices=set(("alelo", "itau", "nubank", "qif")))
+parser_online.add_argument("info", type=str, nargs='*', help="Infos to access")
+parser_online.add_argument("-o", type=argparse.FileType("r"), default=None,
+        dest="output_file", metavar="OUTPUT",
+        help="Output file to write new entries")
+parser_online.set_defaults(func=online)
+
 args = parser.parse_args()
 
 CONFIG = configparser.ConfigParser()
 conf = None
 from_date = None
-input_file = None
 output_file = None
 account_type = args.account
 
 load_list_csv()
-
-if args.date:
-    from_date = dateutil.parser.parse(args.date).timetuple()
 
 if os.path.isfile('ledgerutils.conf'):
     CONFIG.read('ledgerutils.conf')
@@ -47,30 +73,22 @@ if os.path.isfile('ledgerutils.conf'):
 if args.account in CONFIG.sections():
     conf = CONFIG[args.account]
 
+if args.date:
+    from_date = dateutil.parser.parse(args.date).timetuple()
+
+if args.output_file:
+    output_file = args.output_file
+elif conf and 'output_file' in conf:
+    output_file = open(conf['output_file'], "r")
+
 if conf and "account_type" in conf:
     account_type = conf["account_type"]
 
-# Command line has priority over config file
-if args.input_file:
-    input_file = args.input_file
-elif 'input_file' in conf:
-    input_file = open(conf['input_file'], "r")
-if args.output_file:
-    output_file = args.output_file
-elif 'output_file' in conf:
-    output_file = open(conf['output_file'], "r")
-
-LIST_BANKS = {
+MODULES = {
     'alelo': Alelo.Alelo(conf, output_file=output_file, from_date=from_date),
     'itau': Itau.Itau(conf, output_file=output_file, from_date=from_date),
     'nubank': Nubank.Nubank(conf, output_file=output_file, from_date=from_date),
     'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
 }
 
-if input_file:
-    BANK = LIST_BANKS[account_type]
-    if args.command == "import":
-        BANK.read_file(input_file)
-        BANK.write_entry()
-    elif args.command == "online":
-        BANK.online()
+args.func(MODULES[account_type], args)
