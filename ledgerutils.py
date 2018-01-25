@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-Module import
-"""
 
 import sys
 import os
@@ -26,8 +23,10 @@ parser.add_argument("-i", type=argparse.FileType("r"), default=None,
 parser.add_argument("-o", type=argparse.FileType("r"), default=None,
         dest="output_file", metavar="OUTPUT",
         help="Output file to write new entries")
+parser.add_argument("command",
+        help="Command. Currently supports: 'import', and 'online'")
 parser.add_argument("account",
-        help="Format name. Currently supports: 'alelo', 'itau', 'nubank', 'qif'")
+        help="Format name. Currently supports: 'alelo', 'itau', 'nubank', and 'qif'")
 args = parser.parse_args()
 
 CONFIG = configparser.ConfigParser()
@@ -70,5 +69,8 @@ LIST_BANKS = {
 
 if input_file:
     BANK = LIST_BANKS[account_type]
-    BANK.read_file(input_file)
-    BANK.write_entry()
+    if args.command == "import":
+        BANK.read_file(input_file)
+        BANK.write_entry()
+    elif args.command == "online":
+        BANK.online()
