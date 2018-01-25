@@ -160,20 +160,19 @@ def insert_ledger_file(ledger_file, new_entry):
     """
     Insert ledger file
     """
-    input_file = open(ledger_file, 'r').readlines()
-    write_file = open(ledger_file, 'w')
+
+    file_content = open(ledger_file.name, 'r').readlines()
     pattern = re.compile('(\d+-\d+-\d+)')
     done = False
 
-    for line in input_file:
-        if not done and pattern.match(line):
-            date_txt = line.split(' ', 1)[0].split('=', 1)[0]
-            if time.strptime(date_txt, '%Y-%m-%d') > new_entry.date:
-                write_file.write("%s\n\n" % new_entry)
-                done = True
-        write_file.write(line)
+    with open(ledger_file.name, 'w') as output_file:
+        for line in file_content:
+            if not done and pattern.match(line):
+                date_txt = line.split(' ', 1)[0].split('=', 1)[0]
+                if time.strptime(date_txt, '%Y-%m-%d') > new_entry.date:
+                    output_file.write("%s\n\n" % new_entry)
+                    done = True
+            output_file.write(line)
 
-    if not done:
-        write_file.write("\n%s\n" % new_entry)
-
-    write_file.close()
+        if not done:
+            output_file.write("\n%s\n" % new_entry)
