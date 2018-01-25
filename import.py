@@ -9,10 +9,11 @@ import configparser
 import argparse
 import dateutil.parser
 
+from modules import Itau
+from modules import Nubank
+from modules import QIF
+
 from ledger import load_list_csv
-from ledger import Itau
-from ledger import Nubank
-from ledger import QIF
 
 parser = argparse.ArgumentParser(
         description="Import files into ledger format.")
@@ -51,9 +52,9 @@ elif 'input_file' in conf:
     input_file = open(conf['input_file'], "r")
 
 LIST_BANKS = {
-    'itau': Itau(args.output_file, conf, from_date=from_date),
-    'nubank': Nubank(args.output_file, conf, from_date=from_date),
-    'qif': QIF(args.output_file, conf, from_date=from_date)
+    'itau': Itau.Itau(args.output_file, conf, from_date=from_date),
+    'nubank': Nubank.Nubank(args.output_file, conf, from_date=from_date),
+    'qif': QIF.QIF(args.output_file, conf, from_date=from_date)
 }
 
 if input_file:
