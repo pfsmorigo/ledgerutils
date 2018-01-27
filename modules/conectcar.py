@@ -14,14 +14,14 @@ import sys
 sys.path.append("..")
 from ledger import *
 
-class Conectcar(Ledger):
-    """Docstring for Conectcar. """
+class ConectCar(Ledger):
+    """Docstring for ConectCar. """
 
-    _account_name = "Assets:Conectcar"
+    _account_name = "Assets:ConectCar"
     _from_date = None
 
     def __init__(self, conf, output_file=None, from_date=None):
-        """Init Conectcar"""
+        """Init ConectCar"""
         Ledger.__init__(self, conf, output_file)
 
         if conf and 'account_name' in conf:

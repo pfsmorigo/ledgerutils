@@ -110,7 +110,7 @@ if conf and "account_type" in conf:
 
 MODULES = {
     'alelo': alelo.Alelo(conf, output_file=output_file, from_date=from_date),
-    'conectcar': conectcar.Conectcar(conf, output_file=output_file, from_date=from_date),
+    'conectcar': conectcar.ConectCar(conf, output_file=output_file, from_date=from_date),
     'itau': itau.Itau(conf, output_file=output_file, from_date=from_date),
     'nubank': nubank.Nubank(conf, output_file=output_file, from_date=from_date),
     'qif': qif.QIF(conf, output_file=output_file, from_date=from_date)
