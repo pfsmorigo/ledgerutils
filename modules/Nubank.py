@@ -73,6 +73,7 @@ class Nubank(Ledger):
 
             new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)
+        self.write_entry()
 
     def online(self, username, password):
         print "Running selenium..."

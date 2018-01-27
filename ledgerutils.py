@@ -26,7 +26,6 @@ def convert(account_type, args):
 
     if input_file:
         MODULES[account_type].read_file(input_file)
-        MODULES[account_type].write_entry()
 
 def online(account_type, args):
     if account_type == "alelo":
@@ -39,7 +38,6 @@ def online(account_type, args):
 
         if card_number:
             MODULES[account_type].online(card_number=card_number)
-            MODULES[account_type].write_entry()
         else:
             print "Card number needed"
 
@@ -60,7 +58,6 @@ def online(account_type, args):
 
         if username and password:
             MODULES[account_type].online(username, password)
-            MODULES[account_type].write_entry()
         else:
             print "Missing username and/or password"
 

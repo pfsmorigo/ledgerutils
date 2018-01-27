@@ -41,3 +41,4 @@ class QIF(Ledger):
                 new_entry.add(Account(account1, value))
                 new_entry.add(Account(account2))
                 self._list_entry.append(new_entry)
+        self.write_entry()

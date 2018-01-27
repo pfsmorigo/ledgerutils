@@ -58,6 +58,7 @@ class Alelo(Ledger):
             new_entry.add(Account(self._account_name))
             # since entries are from newer to older, insert entry at the beggining
             self._list_entry.insert(0, new_entry)
+        self.write_entry()
 
     def online(self, card_number):
         print "Running selenium..."
@@ -79,5 +80,5 @@ class Alelo(Ledger):
             col = row.find_elements_by_tag_name("td")
             output.append("%s;%s;%s" % (col[0].text, col[1].text, col[2].text))
 
-        self.read_file(output)
         driver.quit()
+        self.read_file(output)

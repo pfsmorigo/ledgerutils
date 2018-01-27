@@ -57,3 +57,4 @@ class Itau(Ledger):
                 new_entry.add(Account(account, value*(-1)))
                 new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)
+        self.write_entry()
