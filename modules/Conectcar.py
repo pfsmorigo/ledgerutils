@@ -29,16 +29,16 @@ class Conectcar(Ledger):
 
         self._from_date = from_date
 
-    def online(self, _username, _password):
+    def online(self, username, password):
         print "Running selenium..."
         chrome_options = Options()
         driver = webdriver.Chrome(chrome_options=chrome_options)
         driver.get("https://cliente.conectcar.com/Autenticacao/Autenticar?ReturnUrl=%2fExtrato")
 
         search_box = driver.find_element_by_id("UserName")
-        search_box.send_keys(_username)
+        search_box.send_keys(username)
         search_box = driver.find_element_by_id("Password")
-        search_box.send_keys(_password)
+        search_box.send_keys(password)
         search_box.submit()
 
         driver.get("https://cliente.conectcar.com/Extrato/ConsultaExtratoCompleto")

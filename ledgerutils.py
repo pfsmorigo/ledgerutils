@@ -42,9 +42,27 @@ def online(module, account_type, args):
             module.write_entry()
         else:
             print "Card number needed"
-    elif account_type == "conectcar" and len(args.info) == 2:
-        module.online(args.info[0], args.info[1])
-        module.write_entry()
+
+    elif account_type == "conectcar":
+        username = None
+        password = None
+
+        if conf and 'username' in conf:
+            username = conf['username']
+        if conf and 'password' in conf:
+            password = conf['password']
+
+        if len(args.info) == 2:
+            username = args.info[0]
+            password = args.info[1]
+        elif len(args.info) == 1:
+            username = args.info[0]
+
+        if username and password:
+            module.online(username, password)
+            module.write_entry()
+        else:
+            print "Missing username and/or password"
     else:
         print "Something went wrong... Check your parameters"
 
