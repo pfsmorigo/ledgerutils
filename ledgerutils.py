@@ -15,7 +15,7 @@ from modules import QIF
 
 from ledger import load_list_csv
 
-def convert(module, account_type, args):
+def convert(account_type, args):
     input_file = None
 
     # Command line has priority over config file
@@ -25,10 +25,10 @@ def convert(module, account_type, args):
         input_file = open(conf['input_file'], "r")
 
     if input_file:
-        module.read_file(input_file)
-        module.write_entry()
+        MODULES[account_type].read_file(input_file)
+        MODULES[account_type].write_entry()
 
-def online(module, account_type, args):
+def online(account_type, args):
     if account_type == "alelo":
         card_number = None
 
@@ -38,8 +38,8 @@ def online(module, account_type, args):
             card_number = conf['card_number']
 
         if card_number:
-            module.online(card_number=card_number)
-            module.write_entry()
+            MODULES[account_type].online(card_number=card_number)
+            MODULES[account_type].write_entry()
         else:
             print "Card number needed"
 
@@ -59,8 +59,8 @@ def online(module, account_type, args):
             username = args.info[0]
 
         if username and password:
-            module.online(username, password)
-            module.write_entry()
+            MODULES[account_type].online(username, password)
+            MODULES[account_type].write_entry()
         else:
             print "Missing username and/or password"
 
@@ -124,4 +124,4 @@ MODULES = {
     'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
 }
 
-args.func(MODULES[account_type], account_type, args)
+args.func(account_type, args)
