@@ -52,7 +52,7 @@ class Nubank(Ledger):
 
             desc = line_split[2]
             value = float(line_split[3])
-            eff_date = self.pay_date(date, self._pay_day, self._best_day)
+            eff_date = pay_date(date, self._pay_day, self._best_day)
             desc, account = translate(desc, "Expenses:Unknown")
             total = 0
 
@@ -69,7 +69,7 @@ class Nubank(Ledger):
                 new_entry = Transaction(date, desc)
                 for _ in range(total):
                     new_entry.add(Account(account, value, eff_date=eff_date))
-                    eff_date = self.pay_date(eff_date, eff_date.tm_mday, 0)
+                    eff_date = pay_date(eff_date, eff_date.tm_mday, 0)
 
             new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)

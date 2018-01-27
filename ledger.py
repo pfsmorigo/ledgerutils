@@ -56,21 +56,6 @@ class Ledger(object):
             else:
                 print("\n%s" % entry)
 
-    def pay_date(self, date, pay_day, best_day):
-        """
-        Pay date
-        """
-        month = date.tm_mon
-        year = date.tm_year
-        if date.tm_mday >= best_day:
-            if date.tm_mon == 12:
-                month = 1
-                year += 1
-            else:
-                month += 1
-        date = "%d-%02d-%02d" % (year, month, pay_day)
-        return time.strptime(date, "%Y-%m-%d")
-
 class Transaction:
     """
     Transaction class
@@ -153,6 +138,22 @@ def load_list_csv():
             TRANSLATION_LIST[row[0]] = [row[1], row[2]]
     finally:
         csv_file.close()
+
+
+def pay_date(self, date, pay_day, best_day):
+    """
+    Pay date
+    """
+    month = date.tm_mon
+    year = date.tm_year
+    if date.tm_mday >= best_day:
+        if date.tm_mon == 12:
+            month = 1
+            year += 1
+        else:
+            month += 1
+    date = "%d-%02d-%02d" % (year, month, pay_day)
+    return time.strptime(date, "%Y-%m-%d")
 
 
 def translate(desc, account="Unknown"):
