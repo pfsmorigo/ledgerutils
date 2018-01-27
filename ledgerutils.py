@@ -43,7 +43,7 @@ def online(module, account_type, args):
         else:
             print "Card number needed"
 
-    elif account_type == "conectcar":
+    else:
         username = None
         password = None
 
@@ -63,8 +63,6 @@ def online(module, account_type, args):
             module.write_entry()
         else:
             print "Missing username and/or password"
-    else:
-        print "Something went wrong... Check your parameters"
 
 parser = argparse.ArgumentParser(
         description="Utilities to help with plaintext accounting.")

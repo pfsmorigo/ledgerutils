@@ -4,6 +4,10 @@ import csv
 import time
 import re
 import os
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 import sys
 sys.path.append("..")
@@ -69,3 +73,39 @@ class Nubank(Ledger):
 
             new_entry.add(Account(self._account_name))
             self._list_entry.append(new_entry)
+
+    def online(self, username, password):
+        print "Running selenium..."
+        chrome_options = Options()
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver.get("https://app.nubank.com.br/#/login")
+
+        search_box = driver.find_element_by_id("username")
+        search_box.send_keys(username)
+        search_box = driver.find_element_by_id("input_001")
+        search_box.send_keys(password)
+        search_box.submit()
+
+        time.sleep(5)
+
+        rows = driver.find_elements_by_xpath("//tr[@class='dc-table-row info']")
+        for row in rows:
+            card_present = row.find_elements_by_class_name("card_present")
+            title = row.find_element_by_class_name("title").text.encode("utf-8")
+            desc = row.find_elements_by_class_name("description")
+            amount = row.find_elements_by_class_name("amount")
+            tags = row.find_element_by_class_name("tags").text.encode("utf-8")
+            date = row.find_element_by_class_name("time").text.encode("utf-8")
+
+            desc = desc[0].text.encode("utf-8") if len(desc) else ""
+            amount = amount[0].text.encode("utf-8") if len(amount) else ""
+
+            print "%s | %s | %s | %s | %s | %d | %d" % (title, desc, amount, tags, date, len(card_present))
+
+            # output.append("%s;%s;%s" % (col[0].text, col[1].text, col[2].text))
+
+        time.sleep(10)
+
+
+
+
