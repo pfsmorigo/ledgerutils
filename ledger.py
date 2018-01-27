@@ -121,6 +121,13 @@ class Ledger(object):
         self._list_entry = []
         self._output_file = output_file
 
+    def list_entry(self):
+        """List entry
+        :returns: TODO
+
+        """
+        return self._list_entry
+
     def write_entry(self):
         """TODO: Docstring for write_entry.
 
@@ -128,18 +135,26 @@ class Ledger(object):
         :returns: None
 
         """
+        print "Writing output to file '%s'... " % self._output_file.name
         for entry in self._list_entry:
             if self._output_file:
-                insert_ledger_file(self._output_file, entry)
+                file_content = open(self._output_file.name, 'r').readlines()
+                pattern = re.compile('(\d+-\d+-\d+)')
+                done = False
+
+                with open(self._output_file.name, 'w') as output_file:
+                    for line in file_content:
+                        if not done and pattern.match(line):
+                            date_txt = line.split(' ', 1)[0].split('=', 1)[0]
+                            if time.strptime(date_txt, '%Y-%m-%d') > entry.date:
+                                output_file.write("%s\n\n" % entry)
+                                done = True
+                        output_file.write(line)
+
+                    if not done:
+                        output_file.write("\n%s\n" % entry)
             else:
                 print("\n%s" % entry)
-
-    def list_entry(self):
-        """List entry
-        :returns: TODO
-
-        """
-        return self._list_entry
 
     def pay_date(self, date, pay_day, best_day):
         """
@@ -155,24 +170,3 @@ class Ledger(object):
                 month += 1
         date = "%d-%02d-%02d" % (year, month, pay_day)
         return time.strptime(date, "%Y-%m-%d")
-
-def insert_ledger_file(ledger_file, new_entry):
-    """
-    Insert ledger file
-    """
-
-    file_content = open(ledger_file.name, 'r').readlines()
-    pattern = re.compile('(\d+-\d+-\d+)')
-    done = False
-
-    with open(ledger_file.name, 'w') as output_file:
-        for line in file_content:
-            if not done and pattern.match(line):
-                date_txt = line.split(' ', 1)[0].split('=', 1)[0]
-                if time.strptime(date_txt, '%Y-%m-%d') > new_entry.date:
-                    output_file.write("%s\n\n" % new_entry)
-                    done = True
-            output_file.write(line)
-
-        if not done:
-            output_file.write("\n%s\n" % new_entry)
