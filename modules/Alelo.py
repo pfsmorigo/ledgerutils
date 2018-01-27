@@ -21,6 +21,7 @@ class Alelo(Ledger):
 
     _account_name = "Assets:Alelo"
     _from_date = None
+    _card_number = None
 
     def __init__(self, conf, output_file=None, from_date=None):
         """Init Alelo"""
@@ -28,6 +29,9 @@ class Alelo(Ledger):
 
         if conf and 'account_name' in conf:
             self._account_name = conf['account_name'].encode('utf-8')
+
+        if conf and 'card_number' in conf:
+            self._card_number = conf['card_number'].encode('utf-8')
 
         self._from_date = from_date
 
@@ -55,14 +59,14 @@ class Alelo(Ledger):
             # since entries are from newer to older, insert entry at the beggining
             self._list_entry.insert(0, new_entry)
 
-    def online(self, _number):
+    def online(self, card_number):
         print "Running selenium..."
         chrome_options = Options()
         driver = webdriver.Chrome(chrome_options=chrome_options)
         driver.get("https://www.meualelo.com.br/")
 
         search_box = driver.find_element_by_name("txtCartao1")
-        search_box.send_keys(_number)
+        search_box.send_keys(card_number)
         raw_input("Press Enter after you enter the catcha...")
         search_box.submit()
 

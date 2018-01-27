@@ -29,9 +29,19 @@ def convert(module, account_type, args):
         module.write_entry()
 
 def online(module, account_type, args):
-    if account_type == "alelo" and len(args.info) == 1:
-        module.online(args.info[0])
-        module.write_entry()
+    if account_type == "alelo":
+        card_number = None
+
+        if len(args.info) == 1:
+            card_number = args.info[0]
+        elif conf and 'card_number' in conf:
+            card_number = conf['card_number']
+
+        if card_number:
+            module.online(card_number=card_number)
+            module.write_entry()
+        else:
+            print "Card number needed"
     elif account_type == "conectcar" and len(args.info) == 2:
         module.online(args.info[0], args.info[1])
         module.write_entry()
