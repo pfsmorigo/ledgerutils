@@ -9,8 +9,67 @@ import re
 import os
 
 TRANSLATION_LIST = {}
-LEDGER_FILE = None
 
+class Ledger(object):
+    """Docstring for Ledger. """
+
+    def __init__(self, conf, output_file):
+        """TODO: Docstring for __init__.
+        :returns: TODO
+
+        """
+        self._list_entry = []
+        self._output_file = output_file
+
+    def list_entry(self):
+        """List entry
+        :returns: TODO
+
+        """
+        return self._list_entry
+
+    def write_entry(self):
+        """TODO: Docstring for write_entry.
+
+        :new_entry:
+        :returns: None
+
+        """
+        print "Writing output to file '%s'... " % self._output_file.name
+        for entry in self._list_entry:
+            if self._output_file:
+                file_content = open(self._output_file.name, 'r').readlines()
+                pattern = re.compile('(\d+-\d+-\d+)')
+                done = False
+
+                with open(self._output_file.name, 'w') as output_file:
+                    for line in file_content:
+                        if not done and pattern.match(line):
+                            date_txt = line.split(' ', 1)[0].split('=', 1)[0]
+                            if time.strptime(date_txt, '%Y-%m-%d') > entry.date:
+                                output_file.write("%s\n\n" % entry)
+                                done = True
+                        output_file.write(line)
+
+                    if not done:
+                        output_file.write("\n%s\n" % entry)
+            else:
+                print("\n%s" % entry)
+
+    def pay_date(self, date, pay_day, best_day):
+        """
+        Pay date
+        """
+        month = date.tm_mon
+        year = date.tm_year
+        if date.tm_mday >= best_day:
+            if date.tm_mon == 12:
+                month = 1
+                year += 1
+            else:
+                month += 1
+        date = "%d-%02d-%02d" % (year, month, pay_day)
+        return time.strptime(date, "%Y-%m-%d")
 
 class Transaction:
     """
@@ -108,65 +167,3 @@ def translate(desc, account="Unknown"):
         if TRANSLATION_LIST[item][1]:
             account = TRANSLATION_LIST[item][1].strip()
     return desc, account
-
-
-class Ledger(object):
-    """Docstring for Ledger. """
-
-    def __init__(self, conf, output_file):
-        """TODO: Docstring for __init__.
-        :returns: TODO
-
-        """
-        self._list_entry = []
-        self._output_file = output_file
-
-    def list_entry(self):
-        """List entry
-        :returns: TODO
-
-        """
-        return self._list_entry
-
-    def write_entry(self):
-        """TODO: Docstring for write_entry.
-
-        :new_entry:
-        :returns: None
-
-        """
-        print "Writing output to file '%s'... " % self._output_file.name
-        for entry in self._list_entry:
-            if self._output_file:
-                file_content = open(self._output_file.name, 'r').readlines()
-                pattern = re.compile('(\d+-\d+-\d+)')
-                done = False
-
-                with open(self._output_file.name, 'w') as output_file:
-                    for line in file_content:
-                        if not done and pattern.match(line):
-                            date_txt = line.split(' ', 1)[0].split('=', 1)[0]
-                            if time.strptime(date_txt, '%Y-%m-%d') > entry.date:
-                                output_file.write("%s\n\n" % entry)
-                                done = True
-                        output_file.write(line)
-
-                    if not done:
-                        output_file.write("\n%s\n" % entry)
-            else:
-                print("\n%s" % entry)
-
-    def pay_date(self, date, pay_day, best_day):
-        """
-        Pay date
-        """
-        month = date.tm_mon
-        year = date.tm_year
-        if date.tm_mday >= best_day:
-            if date.tm_mon == 12:
-                month = 1
-                year += 1
-            else:
-                month += 1
-        date = "%d-%02d-%02d" % (year, month, pay_day)
-        return time.strptime(date, "%Y-%m-%d")
