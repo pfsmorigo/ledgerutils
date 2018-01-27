@@ -7,12 +7,7 @@ import configparser
 import argparse
 import dateutil.parser
 
-from modules import Alelo
-from modules import Conectcar
-from modules import Itau
-from modules import Nubank
-from modules import QIF
-
+from modules import alelo, conectcar, itau, nubank, qif
 from ledger import load_list_csv
 
 def convert(account_type, args):
@@ -114,11 +109,11 @@ if conf and "account_type" in conf:
     account_type = conf["account_type"]
 
 MODULES = {
-    'alelo': Alelo.Alelo(conf, output_file=output_file, from_date=from_date),
-    'conectcar': Conectcar.Conectcar(conf, output_file=output_file, from_date=from_date),
-    'itau': Itau.Itau(conf, output_file=output_file, from_date=from_date),
-    'nubank': Nubank.Nubank(conf, output_file=output_file, from_date=from_date),
-    'qif': QIF.QIF(conf, output_file=output_file, from_date=from_date)
+    'alelo': alelo.Alelo(conf, output_file=output_file, from_date=from_date),
+    'conectcar': conectcar.Conectcar(conf, output_file=output_file, from_date=from_date),
+    'itau': itau.Itau(conf, output_file=output_file, from_date=from_date),
+    'nubank': nubank.Nubank(conf, output_file=output_file, from_date=from_date),
+    'qif': qif.QIF(conf, output_file=output_file, from_date=from_date)
 }
 
 args.func(account_type, args)
