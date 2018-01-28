@@ -2,11 +2,14 @@
 Ledger module
 """
 #!/usr/bin/env python
+# coding=utf-8
 
 import csv
 import time
 import re
 import os
+import dateutil.parser
+from datetime import datetime
 
 TRANSLATION_LIST = {}
 
@@ -35,9 +38,9 @@ class Ledger(object):
         :returns: None
 
         """
-        print "Writing output to file '%s'... " % self._output_file.name
-        for entry in self._list_entry:
-            if self._output_file:
+        if self._output_file:
+            print "Writing output to file '%s'... " % self._output_file.name
+            for entry in self._list_entry:
                 file_content = open(self._output_file.name, 'r').readlines()
                 pattern = re.compile('(\d+-\d+-\d+)')
                 done = False
@@ -53,7 +56,8 @@ class Ledger(object):
 
                     if not done:
                         output_file.write("\n%s\n" % entry)
-            else:
+        else:
+            for entry in self._list_entry:
                 print("\n%s" % entry)
 
 class Transaction:
@@ -140,7 +144,7 @@ def load_list_csv():
         csv_file.close()
 
 
-def pay_date(self, date, pay_day, best_day):
+def pay_date(date, pay_day, best_day):
     """
     Pay date
     """
@@ -154,6 +158,24 @@ def pay_date(self, date, pay_day, best_day):
             month += 1
     date = "%d-%02d-%02d" % (year, month, pay_day)
     return time.strptime(date, "%Y-%m-%d")
+
+
+def import_date(datestr, year = datetime.now().year):
+    translate = [
+        ("Fev", "Feb"), ("Abr", "Apr"), ("Mai", "May"), ("Ago", "Aug"),
+        ("Set", "Sep"), ("Out", "Oct"), ("Dez", "Dec"),]
+
+    datestr = datestr.title()
+    for item in translate:
+        datestr = datestr.replace(item[0], item[1])
+    date = dateutil.parser.parse(datestr)
+    if date > datetime.now():
+        date = date.replace(year = year-1)
+    return date.timetuple()
+
+
+def import_value(valuestr):
+    return float(valuestr.replace("R$", "").replace(".", "").replace(",", "."))
 
 
 def translate(desc, account="Unknown"):
