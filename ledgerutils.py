@@ -7,7 +7,7 @@ import configparser
 import argparse
 import dateutil.parser
 
-from modules import alelo, conectcar, itau, nubank, qif
+from modules import alelo, conectcar, fuel, itau, nubank, qif
 from ledger import load_list_csv
 
 def convert(account_type, args):
@@ -16,8 +16,10 @@ def convert(account_type, args):
     # Command line has priority over config file
     if args.input_file:
         input_file = args.input_file
-    elif 'input_file' in conf:
+    elif conf and 'input_file' in conf:
         input_file = open(conf['input_file'], "r")
+    else:
+        print "Input file needed"
 
     if input_file:
         MODULES[account_type].read_file(input_file)
@@ -111,6 +113,7 @@ if conf and "account_type" in conf:
 MODULES = {
     'alelo': alelo.Alelo(conf, output_file=output_file, from_date=from_date),
     'conectcar': conectcar.ConectCar(conf, output_file=output_file, from_date=from_date),
+    'fuel': fuel.Fuel(conf, output_file=output_file, from_date=from_date),
     'itau': itau.Itau(conf, output_file=output_file, from_date=from_date),
     'nubank': nubank.Nubank(conf, output_file=output_file, from_date=from_date),
     'qif': qif.QIF(conf, output_file=output_file, from_date=from_date)

@@ -75,9 +75,9 @@ class Transaction:
         while '  ' in self.desc:
             self.desc = self.desc.replace('  ', ' ').strip()
 
-        num = self.desc.rsplit(None, 1)[-1]
-        if num.isdigit():
-            self.desc = "(#%s) %s" % (num, self.desc[:-len(num) - 1])
+        # num = self.desc.rsplit(None, 1)[-1]
+        # if num.isdigit():
+            # self.desc = "(#%s) %s" % (num, self.desc[:-len(num) - 1])
 
         if self.eff_date and self.date.tm_year == 1900:
             date_str = "-%s" % time.strftime("%m-%d", self.date)
@@ -110,20 +110,54 @@ class Account(object):
     Class account
     """
 
-    def __init__(self, name=None, value=None, currency="BRL", eff_date=None):
+    _format_account = "\n    {}"
+    _format_ammount = "{:{acw}}{:{amw}.{d}f} {}"
+    _format_fixed_price = " {{={:.{d}f} {}}}"
+    _format_total_price = " @@ {:.{d}f} {}"
+    _format_eff_date = " [{}]"
+    _format_comment = "   ; {}"
+
+    def __init__(self, name = None, value = None, comments = None ,
+            currency = "BRL", decimals = 2, eff_date = None,
+            fixed_price = None, fixed_price_currency = "BRL", fixed_price_decimals = 2,
+            total_price = None, total_price_currency = "BRL", total_price_decimals = 2):
         self.name = str(name) if name else None
         self.value = value
         self.currency = currency
+        self.decimals = decimals
         self.eff_date = eff_date
+        self.account_width = 35
+        self.ammount_width = 12+decimals # keep aligned at decimals
+        self.comments = comments
+        self.fixed_price = fixed_price
+        self.fixed_price_currency = fixed_price_currency
+        self.fixed_price_decimals = fixed_price_decimals
+        self.total_price = total_price
+        self.total_price_currency = total_price_currency
+        self.total_price_decimals = total_price_decimals
 
     def __str__(self):
         if not self.name:
             return ""
-        output = "\n    %s" % self.name
+        output = self._format_account.format(self.name)
         if self.value:
-            output = "%-34s %14.2f %s" % (output, self.value, self.currency)
+            output = self._format_ammount.format(
+                output, self.value, self.currency,
+                acw = self.account_width, amw = self.ammount_width, d = self.decimals)
+
+        if self.fixed_price:
+            output += self._format_fixed_price.format(
+                self.fixed_price, self.fixed_price_currency, d = self.fixed_price_decimals)
+
         if self.eff_date:
-            output += "  ; [=%s]" % time.strftime("%Y-%m-%d", self.eff_date)
+            output += self._format_eff_date.format(time.strftime("%Y-%m-%d", self.eff_date))
+
+        if self.total_price:
+            output += self._format_total_price.format(
+                self.total_price, self.total_price_currency, d = self.total_price_decimals)
+
+        if self.comments:
+            output += self._format_comment.format(self.comments)
 
         return output
 
@@ -190,3 +224,16 @@ def translate(desc, account="Unknown"):
         if TRANSLATION_LIST[item][1]:
             account = TRANSLATION_LIST[item][1].strip()
     return desc, account
+
+def load_csv(_file, delimiter = ','):
+    reader = csv.reader(_file, delimiter = delimiter)
+    headers = reader.next()
+    table = {}
+    size = 0
+    for h in headers:
+        table[h.lower().replace(" ", "_")] = []
+    for row in reader:
+        size += 1
+        for h, v in zip(headers, row):
+            table[h.lower().replace(" ", "_")].append(v)
+    return table, size
