@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 import csv
 import time
@@ -87,26 +88,54 @@ class Nubank(Ledger):
         search_box.send_keys(password)
         search_box.submit()
 
-        time.sleep(5)
+        for i in range(1, 6):
+            time.sleep(3*i)
+            rows = driver.find_elements_by_xpath("//tr[@class='dc-table-row info']")
+            if not rows:
+                print "Not loaded yep. Trying again in %ds (%d/5)..." % (3*i, i)
+                continue
+            else:
+                print "Loaded!"
+                break
 
-        rows = driver.find_elements_by_xpath("//tr[@class='dc-table-row info']")
         for row in rows:
             card_present = row.find_elements_by_class_name("card_present")
             title = row.find_element_by_class_name("title").text.encode("utf-8")
             desc = row.find_elements_by_class_name("description")
             amount = row.find_elements_by_class_name("amount")
             tags = row.find_element_by_class_name("tags").text.encode("utf-8")
-            date = row.find_element_by_class_name("time").text.encode("utf-8")
+            account = "Expenses:Unknown"
+            credit = False
+            eff_date = None
 
+            date = import_date(row.find_element_by_class_name("time").text.encode("utf-8"))
             desc = desc[0].text.encode("utf-8") if len(desc) else ""
-            amount = amount[0].text.encode("utf-8") if len(amount) else ""
+            value = import_value(amount[0].text.encode("utf-8")) if len(amount) else 0.0
 
-            print "%s | %s | %s | %s | %s | %d | %d" % (title, desc, amount, tags, date, len(card_present))
+            if "Fatura paga" in title:
+                continue
+            elif "Pagamento recebido" in title:
+                desc = title
+                credit = True
 
-            # output.append("%s;%s;%s" % (col[0].text, col[1].text, col[2].text))
+            if "Você ganhou um desconto de" in desc:
+                value = import_value(desc.rsplit(None, 1)[-1])
+                desc = "%s (%s)" % (desc.split("Você ganhou um desconto de")[0].strip(), title)
+                account = "Expenses:Discount"
+                credit = True
+            else:
+                desc, account = translate(desc, account)
 
-        time.sleep(10)
+            if not credit:
+                eff_date = pay_date(date, self._pay_day, self._best_day)
 
+            new_entry = Transaction(date, desc, eff_date = eff_date)
+            if credit:
+                new_entry.add(Account(self._account_name, value))
+                new_entry.add(Account(account))
+            else:
+                new_entry.add(Account(account, value))
+                new_entry.add(Account(self._account_name))
 
-
-
+            self._list_entry.insert(0, new_entry)
+        self.write_entry()
