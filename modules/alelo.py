@@ -49,13 +49,18 @@ class Alelo(Ledger):
             if date is not None and date < self._from_date:
                 continue
 
-            desc = str(line_split[1].strip())
+            desc = line_split[1].encode("utf-8").strip()
             value = float(line_split[2].strip().replace("R$ ", "").replace(",", "."))
             desc, account = translate(desc, "Expenses:Unknown")
 
             new_entry = Transaction(date, desc, None)
-            new_entry.add(Account(account, value))
-            new_entry.add(Account(self._account_name))
+            if "Disponibilização de Benefício" in desc:
+                new_entry.add(Account(self._account_name, value))
+                new_entry.add(Account(account))
+            else:
+                new_entry.add(Account(account, value))
+                new_entry.add(Account(self._account_name))
+
             # since entries are from newer to older, insert entry at the beggining
             self._list_entry.insert(0, new_entry)
         self.write_entry()
