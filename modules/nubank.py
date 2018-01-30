@@ -109,6 +109,10 @@ class Nubank(Ledger):
             eff_date = None
 
             date = import_date(row.find_element_by_class_name("time").text.encode("utf-8"))
+
+            if date is not None and date < self._from_date:
+                continue
+
             desc = desc[0].text.encode("utf-8") if len(desc) else ""
             value = import_value(amount[0].text.encode("utf-8")) if len(amount) else 0.0
 
